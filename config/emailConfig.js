@@ -2,13 +2,15 @@ const nodemailer = require('nodemailer');
 
 // Create transporter
 const createTransporter = () => {
-   return nodemailer.createTransport({ // ← Change createTransporter to createTransport
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
+   return nodemailer.createTransport({
+  host: 'mail.mymirage.fr',
+  port: 465, // Alternative port
+  secure: true, // true for port 465
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 };
 
 // Email templates
@@ -25,14 +27,14 @@ const emailTemplates = {
         <p><strong>📅 Submitted:</strong> ${new Date().toLocaleString()}</p>
       </div>
       <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
-        This email was sent from the MSCO website contact form.
+        This email was sent from the Mirage erchandising website contact form.
       </p>
     </div>
   `,
 
   userConfirmation: (contactData) => `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #059669;">✨ Thank You for Your Interest in MSCO!</h2>
+      <h2 style="color: #059669;">✨ Thank You for Your Interest in Mirage erchandising!</h2>
       <p>Dear ${contactData.name},</p>
       <p>We've received your quote request and our team will contact you within <strong>24 hours</strong> to discuss your project.</p>
       
@@ -52,15 +54,15 @@ const emailTemplates = {
 
       <p>📞 If you have any immediate questions, feel free to contact us directly:</p>
       <ul>
-        <li>Email: info@merchelevate.com</li>
-        <li>Phone: +1 (234) 567-890</li>
+        <li>Email: Sveta@mymirage.fr</li>
+        <li>Phone: +40 749 111 592</li>
       </ul>
 
       <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
       
       <p style="color: #6b7280; font-size: 14px;">
         Best regards,<br>
-        <strong>The MSCO Team</strong><br>
+        <strong>The Mirage erchandising Team</strong><br>
         <em>Transforming Retail Spaces</em>
       </p>
     </div>
@@ -96,7 +98,7 @@ const sendContactEmails = async (contactData) => {
 
   // Email to admin
   const adminMailOptions = {
-    from: `MSCO Website <${process.env.EMAIL_USER}>`,
+    from: `Mirage erchandising Website <${process.env.EMAIL_USER}>`,
     to: process.env.ADMIN_EMAIL,
     subject: `📋 New Quote Request: ${contactData.name} - ${contactDataWithLabel.urgencyLabel}`,
     html: emailTemplates.adminNotification(contactDataWithLabel)
@@ -104,9 +106,9 @@ const sendContactEmails = async (contactData) => {
 
   // Email to user
   const userMailOptions = {
-    from: `MSCO <${process.env.EMAIL_USER}>`,
+    from: `Mirage erchandising <${process.env.EMAIL_USER}>`,
     to: contactData.email,
-    subject: '✨ Thank You for Your Quote Request - MSCO',
+    subject: '✨ Thank You for Your Quote Request - Mirage erchandising',
     html: emailTemplates.userConfirmation(contactDataWithLabel)
   };
 
