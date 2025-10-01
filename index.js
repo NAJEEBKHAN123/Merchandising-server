@@ -11,19 +11,24 @@ dotenv.config();
 dbConnection();
 
 // Middleware - MUST come before routes!
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// FIXED CORS SETTINGS - Allow both localhost and your live domain
 app.use(cors({
-  origin: "http://localhost:5173", // or React port
-  methods: ["GET","POST"],
-  allowedHeaders: ["Content-Type"],
+  origin: [
+    "http://localhost:5173", // Development
+    "http://localhost:3000", // Alternative dev port
+    "https://merchandising-client.vercel.app" // Your LIVE frontend
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 
 // Test route
 app.get('/', (req, res) => {
-  res.send('MSCO Server is running!');
+  res.send('Mirage Server is running!');
 });
 
 // Health check endpoint
