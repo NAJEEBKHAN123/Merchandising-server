@@ -15,11 +15,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // FIXED CORS SETTINGS - Allow both localhost and your live domain
+// FIXED CORS SETTINGS - Add your new domain
 app.use(cors({
   origin: [
     "http://localhost:5173", // Development
     "http://localhost:3000", // Alternative dev port
-    "https://merchandising-client.vercel.app" // Your LIVE frontend
+    "https://merchandising-client.vercel.app", // Your Vercel frontend
+    "https://mymirage.fr", // ADD THIS - your new domain
+    "https://www.mymirage.fr" // ADD THIS - www version
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
