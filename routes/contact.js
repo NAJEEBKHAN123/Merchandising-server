@@ -3,14 +3,22 @@ const router = express.Router();
 const {
   submitContactForm,
   submitNewsletter,
-  getContacts
+  getContacts,
+  getContactById,
+  updateContactStatus,
+  deleteContact
 } = require('../controllers/contactController');
+const { requireAdminAuth } = require('../middleware/authMiddleware');
 
-// Public submission routes
+// 🟢 Public submission routes (Only for submitting new leads/newsletter)
 router.post('/', submitContactForm);
 router.post('/newsletter', submitNewsletter);
 
-// Admin retrieval routes
-router.get('/', getContacts);
+// 🔒 Protected admin routes (Strictly requires admin authentication & never cached)
+router.get('/', requireAdminAuth, getContacts);
+router.get('/:id', requireAdminAuth, getContactById);
+router.put('/:id', requireAdminAuth, updateContactStatus);
+router.patch('/:id', requireAdminAuth, updateContactStatus);
+router.delete('/:id', requireAdminAuth, deleteContact);
 
 module.exports = router;

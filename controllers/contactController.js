@@ -158,8 +158,108 @@ const getContacts = async (req, res) => {
   }
 };
 
+// @desc    Get single contact lead by ID (for admin)
+// @route   GET /api/contact/:id
+// @access  Private/Admin
+const getContactById = async (req, res) => {
+  try {
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: 'Lead not found'
+      });
+    }
+    res.json({
+      success: true,
+      data: contact
+    });
+  } catch (error) {
+    console.error('❌ Get contact by ID error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving lead details'
+    });
+  }
+};
+
+// @desc    Update contact lead status (for admin)
+// @route   PUT /api/contact/:id or PATCH /api/contact/:id
+// @access  Private/Admin
+const updateContactStatus = async (req, res) => {
+  try {
+    const { status, notes } = req.body;
+    const validStatuses = ['new', 'contacted', 'quoted', 'closed'];
+
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+      });
+    }
+
+    const updateFields = {};
+    if (status) updateFields.status = status;
+    if (notes !== undefined) updateFields.notes = notes;
+
+    const contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    );
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: 'Lead not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: contact
+    });
+  } catch (error) {
+    console.error('❌ Update contact error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating lead'
+    });
+  }
+};
+
+// @desc    Delete contact lead (for admin)
+// @route   DELETE /api/contact/:id
+// @access  Private/Admin
+const deleteContact = async (req, res) => {
+  try {
+    const contact = await Contact.findByIdAndDelete(req.params.id);
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: 'Lead not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Lead removed successfully',
+      data: { id: req.params.id }
+    });
+  } catch (error) {
+    console.error('❌ Delete contact error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting lead'
+    });
+  }
+};
+
 module.exports = {
   submitContactForm,
   submitNewsletter,
-  getContacts
+  getContacts,
+  getContactById,
+  updateContactStatus,
+  deleteContact
 };
