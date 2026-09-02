@@ -2,22 +2,23 @@ const express = require('express');
 const router = express.Router();
 const {
   submitContactForm,
-  submitNewsletter
+  submitNewsletter,
+  getContacts,
+  getContactById,
+  updateContactStatus,
+  deleteContact
 } = require('../controllers/contactController');
+const { requireAdminAuth } = require('../middleware/authMiddleware');
 
-// Only POST endpoints are permitted (Lead ingestion only)
+// 🟢 Public submission routes (Lead generation only)
 router.post('/', submitContactForm);
 router.post('/newsletter', submitNewsletter);
 
-// Block all non-POST methods (GET, PUT, DELETE, PATCH, etc.)
-router.use((req, res) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, private');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.status(405).json({
-    success: false,
-    message: `Method ${req.method} is not allowed on this endpoint. This API is strictly write-only (POST) for contact submissions.`
-  });
-});
+// 🔒 Protected Administrator CRUD routes (Strictly requires admin authentication & never cached)
+router.get('/', requireAdminAuth, getContacts);
+router.get('/:id', requireAdminAuth, getContactById);
+router.put('/:id', requireAdminAuth, updateContactStatus);
+router.patch('/:id', requireAdminAuth, updateContactStatus);
+router.delete('/:id', requireAdminAuth, deleteContact);
 
 module.exports = router;

@@ -235,7 +235,7 @@ const emailTemplates = {
         <h2 style="color: #059669; margin-bottom: 8px;">${isNewsletter ? t.newsletterSubject : t.quoteSubject}</h2>
         <p>${t.greeting(contactData.name)}</p>
         <p>${t.intro}</p>
-        
+
         <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #059669; margin: 20px 0;">
           <h3 style="color: #065f46; margin-top: 0;">${t.summaryTitle}</h3>
           ${!isNewsletter ? `<p style="margin: 6px 0;"><strong>${t.urgencyTitle}</strong> ${contactData.urgencyLabel}</p>` : ''}
@@ -254,7 +254,7 @@ const emailTemplates = {
         </ul>
 
         <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
-        
+
         <p style="color: #64748b; font-size: 13px;">
           ${t.regards}<br>
           <strong>${t.teamName}</strong><br>
