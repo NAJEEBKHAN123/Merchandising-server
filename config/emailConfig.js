@@ -16,54 +16,53 @@ const createTransporter = () => {
 // Email templates
 const emailTemplates = {
   adminNotification: (contactData) => `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #2563eb;">📋 New Quote Request Received</h2>
-      <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb;">
-        <p><strong>👤 Name:</strong> ${contactData.name}</p>
-        <p><strong>📧 Email:</strong> ${contactData.email}</p>
-        <p><strong>📞 Phone:</strong> ${contactData.phone}</p>
-        <p><strong>⏰ Urgency:</strong> ${contactData.urgencyLabel}</p>
-        <p><strong>💬 Message:</strong> ${contactData.message || 'No message provided'}</p>
-        <p><strong>📅 Submitted:</strong> ${new Date().toLocaleString()}</p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
+      <h2 style="color: #2563eb; margin-bottom: 8px;">📋 New ${contactData.leadType === 'newsletter' ? 'Newsletter Subscription' : 'Quote Request'} Received</h2>
+      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb;">
+        <p style="margin: 6px 0;"><strong>👤 Name:</strong> ${contactData.name}</p>
+        <p style="margin: 6px 0;"><strong>📧 Email:</strong> ${contactData.email}</p>
+        <p style="margin: 6px 0;"><strong>📞 Phone:</strong> ${contactData.phone}</p>
+        ${contactData.leadType !== 'newsletter' ? `<p style="margin: 6px 0;"><strong>⏰ Urgency:</strong> ${contactData.urgencyLabel}</p>` : ''}
+        <p style="margin: 6px 0;"><strong>💬 Message:</strong> ${contactData.message || (contactData.leadType === 'newsletter' ? 'Newsletter subscription' : 'No message provided')}</p>
+        <p style="margin: 6px 0;"><strong>📅 Submitted:</strong> ${new Date().toLocaleString()}</p>
       </div>
-      <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
-        This email was sent from the Mirage erchandising website contact form.
+      <p style="margin-top: 20px; color: #64748b; font-size: 13px;">
+        This alert was generated automatically from the Mirage Merchandising website.
       </p>
     </div>
   `,
 
   userConfirmation: (contactData) => `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #059669;">✨ Thank You for Your Interest in Mirage erchandising!</h2>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
+      <h2 style="color: #059669; margin-bottom: 8px;">✨ Thank You for Contacting Mirage Merchandising!</h2>
       <p>Dear ${contactData.name},</p>
-      <p>We've received your quote request and our team will contact you within <strong>24 hours</strong> to discuss your project.</p>
+      <p>We've received your inquiry and our operations team will get in touch with you within <strong>24 hours</strong>.</p>
       
       <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #059669; margin: 20px 0;">
-        <h3 style="color: #065f46; margin-top: 0;">Your Request Details:</h3>
-        <p><strong>⏰ Service Urgency:</strong> ${contactData.urgencyLabel}</p>
-        <p><strong>💬 Your Message:</strong> ${contactData.message || 'No additional details provided'}</p>
+        <h3 style="color: #065f46; margin-top: 0;">Your Submission Summary:</h3>
+        ${contactData.leadType !== 'newsletter' ? `<p style="margin: 6px 0;"><strong>⏰ Urgency:</strong> ${contactData.urgencyLabel}</p>` : ''}
+        <p style="margin: 6px 0;"><strong>💬 Message:</strong> ${contactData.message || 'No additional details provided'}</p>
       </div>
 
       <p><strong>🔜 What happens next?</strong></p>
-      <ol>
-        <li>Our team will review your requirements</li>
-        <li>We'll contact you to discuss details</li>
-        <li>We'll prepare a customized quote</li>
-        <li>We'll schedule your project</li>
+      <ol style="line-height: 1.6;">
+        <li>Our retail specialists review your requirements</li>
+        <li>We contact you to verify operational timelines and store dimensions</li>
+        <li>We prepare a turnkey, zero-disruption project proposal</li>
       </ol>
 
-      <p>📞 If you have any immediate questions, feel free to contact us directly:</p>
-      <ul>
-        <li>Email: Sveta@mymirage.fr</li>
-        <li>Phone: +40 749 111 592</li>
+      <p>📞 Need immediate assistance? Contact us directly:</p>
+      <ul style="line-height: 1.6;">
+        <li>Email: <a href="mailto:Sveta@mymirage.fr" style="color: #2563eb;">Sveta@mymirage.fr</a></li>
+        <li>Phone: <a href="tel:+40749111592" style="color: #2563eb;">+40 749 111 592</a></li>
       </ul>
 
-      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
       
-      <p style="color: #6b7280; font-size: 14px;">
+      <p style="color: #64748b; font-size: 13px;">
         Best regards,<br>
-        <strong>The Mirage erchandising Team</strong><br>
-        <em>Transforming Retail Spaces</em>
+        <strong>The Mirage Merchandising Team</strong><br>
+        <em>Retail Transformations & Merchandising Execution</em>
       </p>
     </div>
   `
@@ -88,27 +87,37 @@ const sendContactEmails = async (contactData) => {
     urgent: 'Urgent (Within 1 week)',
     soon: 'Soon (Within 2-3 weeks)',
     planning: 'Planning (Next month)',
-    future: 'Future (Just gathering info)'
+    future: 'Future (Information gathering)'
   };
 
   const contactDataWithLabel = {
     ...contactData,
-    urgencyLabel: urgencyLabels[contactData.urgency] || contactData.urgency
+    urgencyLabel: urgencyLabels[contactData.urgency] || contactData.urgency || 'Future'
   };
+
+  const isNewsletter = contactData.leadType === 'newsletter';
 
   // Email to admin
   const adminMailOptions = {
-    from: `Mirage erchandising Website <${process.env.EMAIL_USER}>`,
-    to: process.env.ADMIN_EMAIL,
-    subject: `📋 New Quote Request: ${contactData.name} - ${contactDataWithLabel.urgencyLabel}`,
+    from: `"Mirage Merchandising" <${process.env.EMAIL_USER}>`,
+    to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+    replyTo: contactData.email,
+    subject: isNewsletter
+      ? `📬 New Newsletter Subscriber: ${contactData.email}`
+      : `📋 New Quote Request: ${contactData.name} (${contactDataWithLabel.urgencyLabel})`,
+    text: `New ${contactData.leadType === 'newsletter' ? 'Newsletter Subscription' : 'Quote Request'}\n\nName: ${contactData.name}\nEmail: ${contactData.email}\nPhone: ${contactData.phone}\nUrgency: ${contactDataWithLabel.urgencyLabel}\nMessage: ${contactData.message || 'N/A'}\nDate: ${new Date().toLocaleString()}`,
     html: emailTemplates.adminNotification(contactDataWithLabel)
   };
 
   // Email to user
   const userMailOptions = {
-    from: `Mirage erchandising <${process.env.EMAIL_USER}>`,
+    from: `"Mirage Merchandising" <${process.env.EMAIL_USER}>`,
     to: contactData.email,
-    subject: '✨ Thank You for Your Quote Request - Mirage erchandising',
+    replyTo: process.env.EMAIL_USER,
+    subject: isNewsletter
+      ? 'Welcome to Mirage Merchandising Updates'
+      : 'We received your quote request - Mirage Merchandising',
+    text: `Dear ${contactData.name},\n\nThank you for contacting Mirage Merchandising. We have received your inquiry and our operations team will get in touch with you within 24 hours.\n\nYour Request Details:\n- Urgency: ${contactDataWithLabel.urgencyLabel}\n- Message: ${contactData.message || 'No additional details provided'}\n\nContact us directly:\nEmail: Sveta@mymirage.fr\nPhone: +40 749 111 592\n\nBest regards,\nThe Mirage Merchandising Team`,
     html: emailTemplates.userConfirmation(contactDataWithLabel)
   };
 

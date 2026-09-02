@@ -12,30 +12,45 @@ const contactSchema = new mongoose.Schema({
     required: [true, 'Email is required'],
     trim: true,
     lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
+    match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email']
   },
   phone: {
     type: String,
-    required: [true, 'Phone number is required'],
-    trim: true
+    trim: true,
+    default: 'N/A'
   },
   message: {
     type: String,
     trim: true,
-    maxlength: [1000, 'Message cannot exceed 1000 characters']
+    maxlength: [2000, 'Message cannot exceed 2000 characters'],
+    default: ''
   },
   urgency: {
     type: String,
-    required: [true, 'Urgency is required'],
     enum: {
       values: ['urgent', 'soon', 'planning', 'future'],
       message: 'Urgency must be: urgent, soon, planning, or future'
-    }
+    },
+    default: 'future'
+  },
+  leadType: {
+    type: String,
+    enum: ['quote_request', 'newsletter', 'general_contact'],
+    default: 'quote_request'
   },
   status: {
     type: String,
     enum: ['new', 'contacted', 'quoted', 'closed'],
     default: 'new'
+  },
+  sourceUrl: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  ipAddress: {
+    type: String,
+    default: ''
   },
   date: {
     type: Date,
