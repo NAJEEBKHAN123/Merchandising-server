@@ -52,6 +52,11 @@ const contactSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  lang: {
+    type: String,
+    trim: true,
+    default: 'fr'
+  },
   date: {
     type: Date,
     default: Date.now

@@ -10,7 +10,7 @@ const submitContactForm = async (req, res) => {
   try {
     console.log('📥 Incoming contact submission:', req.body);
 
-    const { name, email, phone, message, urgency, leadType, sourceUrl } = req.body;
+    const { name, email, phone, message, urgency, leadType, sourceUrl, lang } = req.body;
 
     // Check for newsletter type
     const isNewsletter = leadType === 'newsletter' || name === 'Newsletter Subscriber';
@@ -44,6 +44,7 @@ const submitContactForm = async (req, res) => {
     const cleanName = name ? name.trim() : (isNewsletter ? 'Newsletter Subscriber' : 'Website Visitor');
     const cleanPhone = phone ? phone.trim() : 'N/A';
     const cleanUrgency = ['urgent', 'soon', 'planning', 'future'].includes(urgency) ? urgency : 'future';
+    const cleanLang = (lang && ['fr', 'en', 'de', 'nl', 'it', 'es', 'ro'].includes(lang.toLowerCase())) ? lang.toLowerCase() : 'fr';
 
     // 1. Save lead to MongoDB
     const newContact = new Contact({
@@ -54,11 +55,12 @@ const submitContactForm = async (req, res) => {
       urgency: cleanUrgency,
       leadType: isNewsletter ? 'newsletter' : (leadType || 'quote_request'),
       sourceUrl: sourceUrl || req.headers.referer || '',
-      ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress || ''
+      ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress || '',
+      lang: cleanLang
     });
 
     const savedContact = await newContact.save();
-    console.log(`✅ Lead saved to database [ID: ${savedContact._id}, Type: ${savedContact.leadType}]`);
+    console.log(`✅ Lead saved to database [ID: ${savedContact._id}, Type: ${savedContact.leadType}, Lang: ${cleanLang}]`);
 
     // 2. Dispatch internal alert and confirmation email
     let emailStatus = { admin: false, user: false };
@@ -69,7 +71,8 @@ const submitContactForm = async (req, res) => {
         phone: cleanPhone,
         message: message ? message.trim() : '',
         urgency: cleanUrgency,
-        leadType: savedContact.leadType
+        leadType: savedContact.leadType,
+        lang: cleanLang
       });
 
       emailStatus.admin = emailResults[0]?.status === 'fulfilled' && emailResults[0]?.value?.success;
